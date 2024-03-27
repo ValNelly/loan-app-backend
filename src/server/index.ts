@@ -6,6 +6,7 @@ import { handleErrors } from "../middlewares";
 import logger from "../shared/logger";
 
 import { default as usersRouter } from "../features/routes/users";
+import { default as loanRouter } from "../features/routes/loans";
 
 /**
  * Handle database connection logic
@@ -46,7 +47,7 @@ export const configureExpressApp = async (app: Application) => {
   //------------------- routes --------------------------------
   // Add routes here
   app.use("/users", usersRouter);
-  // app.use("/api/auth", authRoutes);
+  app.use(loanRouter);
   //-------------------end routes-----------------------------
 
   //---------------- error handler -----------------------

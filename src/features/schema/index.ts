@@ -39,7 +39,7 @@ export const FeedSchema = z.object({
 export const LoanRequestSchema = z.object({
   loan: z.string().uuid(),
   type: z.enum(["Money", "Feed"]),
-  amount: z.coerce.number(),
+  amount: z.coerce.number().optional(),
   feeds: z
     .array(z.object({ feed: z.string().uuid(), quantity: z.coerce.number() }))
     .optional()
