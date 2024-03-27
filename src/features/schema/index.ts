@@ -13,6 +13,14 @@ export const RegisterSchema = z
     path: ["confirmPassword"],
   });
 
+export const ProfileSchema = z.object({
+  name: z.string(),
+  username: z.string(),
+  email: z.string().email(),
+  phoneNumber: z.string(),
+  gender: z.enum(["MALE", "FEMALE"]),
+});
+
 export const LoginSchema = z.object({
   username: z.string(),
   password: z.string().min(4),
