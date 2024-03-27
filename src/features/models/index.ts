@@ -4,3 +4,4 @@ export const UserModel = prisma.user;
 export const LoanModel = prisma.loan;
 export const LoanRequestModel = prisma.loanRequest;
 export const FeedModel = prisma.feed;
+export const FeedLoanModel = prisma.feedLoan;

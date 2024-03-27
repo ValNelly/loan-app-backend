@@ -32,7 +32,7 @@ export const LoanSchema = z.object({
 });
 
 export const FeedSchema = z.object({
-  name: z.coerce.number(),
+  name: z.string(),
   unitPrice: z.coerce.number(),
 });
 
