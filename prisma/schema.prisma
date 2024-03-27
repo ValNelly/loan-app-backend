@@ -1,0 +1,75 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String        @id @default(uuid())
+  name        String?
+  email       String       @unique
+  username    String       @unique
+  phoneNumber String       @unique
+  gender      Gender        @default(UNKNOWN)
+  password    String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  loans       LoanRequest[]
+}
+
+model Loan {
+  id           String        @id @default(uuid())
+  amount       Decimal
+  interestRate Decimal
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  requests     LoanRequest[]
+}
+
+model LoanRequest {
+  id        String     @id @default(uuid())
+  userId    String
+  user      User       @relation(fields: [userId], onDelete: Cascade, references: [id])
+  loanId    String
+  loan      Loan       @relation(fields: [loanId], onDelete: Cascade, references: [id])
+  type      LoanType
+  amount    Decimal
+  status    LoanStatus
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  feedsLoan Feed[]
+}
+
+model Feed {
+  id        String      @id @default(uuid())
+  requestId String
+  request   LoanRequest @relation(fields: [requestId], onDelete: Cascade, references: [id])
+  feed      String
+  quantity  Decimal
+  unitPrice Int
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
+enum LoanType {
+  Money
+  Feed
+}
+
+enum LoanStatus {
+  Pending
+  Aproved
+  Rejected
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  UNKNOWN
+}
