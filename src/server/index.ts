@@ -4,8 +4,8 @@ import morgan from "morgan";
 import { MEDIA_ROOT, configuration } from "../utils";
 import { handleErrors } from "../middlewares";
 import logger from "../shared/logger";
-// import { oauthRoutesHandler } from "./auth.config";
-import prisma from "../../prisma/client";
+
+import { default as usersRouter } from "../features/routes/users";
 
 /**
  * Handle database connection logic
@@ -45,7 +45,7 @@ export const configureExpressApp = async (app: Application) => {
 
   //------------------- routes --------------------------------
   // Add routes here
-  // app.use("/users", usersRouter);
+  app.use("/users", usersRouter);
   // app.use("/api/auth", authRoutes);
   //-------------------end routes-----------------------------
 

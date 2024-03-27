@@ -13,9 +13,9 @@ datasource db {
 model User {
   id          String        @id @default(uuid())
   name        String?
-  email       String       @unique
-  username    String       @unique
-  phoneNumber String       @unique
+  email       String        @unique
+  username    String        @unique
+  phoneNumber String        @unique
   gender      Gender        @default(UNKNOWN)
   password    String
   createdAt   DateTime      @default(now())
@@ -40,19 +40,28 @@ model LoanRequest {
   loan      Loan       @relation(fields: [loanId], onDelete: Cascade, references: [id])
   type      LoanType
   amount    Decimal
-  status    LoanStatus
+  status    LoanStatus @default(Pending)
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
-  feedsLoan Feed[]
+  feedsLoan FeedLoan[]
 }
 
 model Feed {
+  id        String     @id @default(uuid())
+  name      String
+  unitPrice Decimal
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  loans     FeedLoan[]
+}
+
+model FeedLoan {
   id        String      @id @default(uuid())
   requestId String
   request   LoanRequest @relation(fields: [requestId], onDelete: Cascade, references: [id])
-  feed      String
+  feedId    String
+  feed      Feed        @relation(fields: [feedId], onDelete: Cascade, references: [id])
   quantity  Decimal
-  unitPrice Int
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
 }

@@ -25,3 +25,23 @@ export const LoginSchema = z.object({
   username: z.string(),
   password: z.string().min(4),
 });
+
+export const LoanSchema = z.object({
+  amount: z.coerce.number(),
+  interestRate: z.coerce.number().min(0).max(100),
+});
+
+export const FeedSchema = z.object({
+  name: z.coerce.number(),
+  unitPrice: z.coerce.number(),
+});
+
+export const LoanRequestSchema = z.object({
+  loan: z.string().uuid(),
+  type: z.enum(["Money", "Feed"]),
+  amount: z.coerce.number(),
+  feeds: z
+    .array(z.object({ feed: z.string().uuid(), quantity: z.coerce.number() }))
+    .optional()
+    .default([]),
+});
