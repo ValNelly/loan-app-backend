@@ -21,6 +21,18 @@ export const getUsers = async (
   }
 };
 
+export const viewProfile = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    return res.json((req as any).user);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const register = async (
   req: Request,
   res: Response,

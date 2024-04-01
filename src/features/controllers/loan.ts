@@ -113,8 +113,8 @@ export const requestLoan = async (
       throw new APIException(400, validation.error.format());
     const { amount, feeds, loan, type } = validation.data;
     const errors: any = {};
-    if (await LoanModel.findUnique({ where: { id: loan } }))
-      errors["loan"] = { _errors: ["Invalid loan"] };
+    const _loan = await LoanModel.findUnique({ where: { id: loan } });
+    if (!_loan) errors["loan"] = { _errors: ["Invalid loan"] };
     const feedChecks = await Promise.all(
       feeds.map((feed) => FeedModel.findUnique({ where: { id: feed.feed } }))
     );
@@ -122,7 +122,7 @@ export const requestLoan = async (
     if (feedIndex !== -1)
       errors["feeds"] = { _errors: [`Feed ${feedIndex} not found`] };
 
-    if (!isEmpty) throw { status: 400, errors };
+    if (!isEmpty(errors)) throw { status: 400, errors };
 
     const ammount = feedChecks.reduce((prev, curr, idex) => {
       return (
@@ -130,9 +130,9 @@ export const requestLoan = async (
         (parseFloat((curr?.unitPrice as any) ?? 0) ?? 0 * feeds[idex].quantity)
       );
     }, 0);
-    const loanRequest = LoanRequestModel.create({
+    const loanRequest = await LoanRequestModel.create({
       data: {
-        amount: ammount,
+        amount: type === "Money" ? _loan?.amount ?? ammount : ammount,
         type,
         loanId: loan,
         userId: (req as any).user.id,
@@ -146,7 +146,7 @@ export const requestLoan = async (
         },
       },
     });
-    return res.json(loan);
+    return res.json(loanRequest);
   } catch (error) {
     next(error);
   }
