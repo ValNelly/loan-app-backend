@@ -35,7 +35,9 @@ export const getLoanRequest = async (
   next: NextFunction
 ) => {
   try {
-    const loans = await LoanRequestModel.findMany();
+    const loans = await LoanRequestModel.findMany({
+      include: { user: true, loan: true, feedsLoan: true },
+    });
     return res.json({ results: loans });
   } catch (error) {
     next(error);
@@ -49,6 +51,13 @@ export const getMyLoanRequest = async (
   try {
     const loans = await LoanRequestModel.findMany({
       where: { userId: (req as any).user.id },
+      include: {
+        user: true,
+        loan: true,
+        feedsLoan: {
+          include: { feed: true },
+        },
+      },
     });
     return res.json({ results: loans });
   } catch (error) {
