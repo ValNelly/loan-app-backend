@@ -36,7 +36,13 @@ export const getLoanRequest = async (
 ) => {
   try {
     const loans = await LoanRequestModel.findMany({
-      include: { user: true, loan: true, feedsLoan: true },
+      include: {
+        user: true,
+        loan: true,
+        feedsLoan: {
+          include: { feed: true },
+        },
+      },
     });
     return res.json({ results: loans });
   } catch (error) {
