@@ -14,6 +14,6 @@ router.put("/profile", authenticate, updateProfile);
 router.get("/profile", authenticate, viewProfile);
 router.post("/register", register);
 router.post("/login", login);
-router.post("/", getUsers);
+router.get("/", getUsers);
 
 export default router;
