@@ -3,6 +3,7 @@ import { FeedModel, LoanModel, LoanRequestModel } from "../models";
 import { FeedSchema, LoanRequestSchema, LoanSchema } from "../schema";
 import { APIException } from "../../shared/exceprions";
 import { findIndex, isEmpty } from "lodash";
+import { z } from "zod";
 
 export const getFeeds = async (
   req: Request,
@@ -92,6 +93,39 @@ export const addFeed = async (
   }
 };
 
+export const updateFeed = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    if (
+      !z.string().uuid().safeParse(req.params.id).success ||
+      !(await FeedModel.findUnique({ where: { id: req.params.id } }))
+    )
+      throw { status: 404, errors: { detail: "Feed not found" } };
+    const validation = await FeedSchema.safeParseAsync(req.body);
+    if (!validation.success)
+      throw new APIException(400, validation.error.format());
+    if (
+      await FeedModel.findFirst({
+        where: { name: validation.data.name, id: { not: req.params.id } },
+      })
+    )
+      throw {
+        status: 400,
+        errors: { name: { _errors: ["Feed with simalar name already exist"] } },
+      };
+    const feeds = await FeedModel.update({
+      where: { id: req.params.id },
+      data: validation.data,
+    });
+    return res.json(feeds);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const addLoan = async (
   req: Request,
   res: Response,
@@ -111,6 +145,41 @@ export const addLoan = async (
         },
       };
     const loan = await LoanModel.create({ data: validation.data });
+    return res.json(loan);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateLoan = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    if (
+      !z.string().uuid().safeParse(req.params.id).success ||
+      !(await LoanModel.findUnique({ where: { id: req.params.id } }))
+    )
+      throw { status: 404, errors: { detail: "Feed not found" } };
+    const validation = await LoanSchema.safeParseAsync(req.body);
+    if (!validation.success)
+      throw new APIException(400, validation.error.format());
+    if (
+      await LoanModel.findFirst({
+        where: { amount: validation.data.amount, id: { not: req.params.id } },
+      })
+    )
+      throw {
+        status: 400,
+        errors: {
+          amount: { _errors: ["Loan with simalar amount already exist"] },
+        },
+      };
+    const loan = await LoanModel.update({
+      where: { id: req.params.id },
+      data: validation.data,
+    });
     return res.json(loan);
   } catch (error) {
     next(error);
