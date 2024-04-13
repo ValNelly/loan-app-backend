@@ -1,6 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 import { UserModel } from "../models";
-import { LoginSchema, ProfileSchema, RegisterSchema } from "../schema";
+import {
+  LoginSchema,
+  ProfileSchema,
+  RegisterSchema,
+  UserSchema,
+} from "../schema";
 import { APIException } from "../../shared/exceprions";
 import {
   checkPassword,
@@ -8,6 +13,7 @@ import {
   hashPassword,
 } from "../../utils/helpers";
 import { isEmpty } from "lodash";
+import { z } from "zod";
 
 export const getUsers = async (
   req: Request,
@@ -61,6 +67,60 @@ export const register = async (
       },
     });
     return res.json({ user, token: generateUserToken({ id: user.id }) });
+  } catch (error) {
+    next(error);
+  }
+};
+export const updateUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    if (!z.string().uuid().safeParse(req.params.id).success)
+      throw { status: 404, errors: { detail: "User not found!" } };
+    const _user = await UserModel.findUnique({ where: { id: req.params.id } });
+    if (!_user) throw { status: 404, errors: { detail: "User not found!" } };
+    const validation = await UserSchema.safeParseAsync(req.body);
+    if (!validation.success)
+      throw new APIException(400, validation.error.format());
+    const { gender, name, email, username, phoneNumber, isStaff } =
+      validation.data;
+    // const _user = (req as any).user;
+    const errors: any = {};
+    if (
+      username &&
+      (await UserModel.findFirst({
+        where: { username, id: { not: _user.id } },
+      }))
+    )
+      errors["username"] = { _errors: ["User with username exist"] };
+    if (
+      email &&
+      (await UserModel.findFirst({ where: { email, id: { not: _user.id } } }))
+    )
+      errors["email"] = { _errors: ["User with email exist"] };
+    if (
+      phoneNumber &&
+      (await UserModel.findFirst({
+        where: { phoneNumber, id: { not: _user.id } },
+      }))
+    )
+      errors["phoneNumber"] = { _errors: ["User with phone number exist"] };
+    if (!isEmpty(errors)) throw { status: 400, errors };
+
+    const user = await UserModel.update({
+      where: { id: _user.id },
+      data: {
+        email,
+        phoneNumber,
+        username,
+        gender,
+        name,
+        isStaff,
+      },
+    });
+    return res.json(user);
   } catch (error) {
     next(error);
   }
