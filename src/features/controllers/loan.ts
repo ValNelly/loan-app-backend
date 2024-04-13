@@ -50,6 +50,33 @@ export const getLoanRequest = async (
     next(error);
   }
 };
+export const updateLoanRequestStatus = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    if (
+      !z.string().uuid().safeParse(req.params.id).success ||
+      !(await LoanRequestModel.findUnique({ where: { id: req.params.id } }))
+    )
+      throw { status: 404, errors: { detail: "Loan request not found!" } };
+    const actionValidation = z
+      .enum(["aprove", "reject"])
+      .safeParse(req.params.action);
+    if (!actionValidation.success)
+      throw { status: 403, errors: { detail: "Action not supported" } };
+    const loans = await LoanRequestModel.update({
+      where: { id: req.params.id },
+      data: {
+        status: actionValidation.data === "aprove" ? "Aproved" : "Rejected",
+      },
+    });
+    return res.json(loans);
+  } catch (error) {
+    next(error);
+  }
+};
 export const getMyLoanRequest = async (
   req: Request,
   res: Response,

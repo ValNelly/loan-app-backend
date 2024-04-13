@@ -9,6 +9,7 @@ import {
   getLoanRequest,
   updateFeed,
   updateLoan,
+  updateLoanRequestStatus,
 } from "../controllers/loan";
 import authenticate from "../../middlewares/authentication";
 
@@ -22,6 +23,7 @@ router.post("/feeds", addFeed);
 router.put("/feeds/:id", updateFeed);
 router.get("/my-loans", authenticate, getMyLoanRequest);
 router.get("/loan-requests", getLoanRequest);
+router.put("/loan-requests/:id/:action", updateLoanRequestStatus);
 router.post("/request-loan", authenticate, requestLoan);
 
 export default router;
