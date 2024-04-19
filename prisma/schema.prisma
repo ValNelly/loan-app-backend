@@ -17,6 +17,7 @@ model User {
   username    String        @unique
   phoneNumber String        @unique
   gender      Gender        @default(UNKNOWN)
+  isStaff     Boolean       @default(false)
   password    String
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt

@@ -21,6 +21,15 @@ export const ProfileSchema = z.object({
   gender: z.enum(["MALE", "FEMALE"]),
 });
 
+export const UserSchema = z.object({
+  name: z.string().optional(),
+  username: z.string().optional(),
+  email: z.string().email().optional(),
+  phoneNumber: z.string().optional(),
+  gender: z.enum(["MALE", "FEMALE"]).optional(),
+  isStaff: z.boolean().optional(),
+});
+
 export const LoginSchema = z.object({
   username: z.string(),
   password: z.string().min(4),

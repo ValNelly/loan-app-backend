@@ -4,6 +4,7 @@ import {
   login,
   register,
   updateProfile,
+  updateUser,
   viewProfile,
 } from "../controllers/users";
 import authenticate from "../../middlewares/authentication";
@@ -14,6 +15,7 @@ router.put("/profile", authenticate, updateProfile);
 router.get("/profile", authenticate, viewProfile);
 router.post("/register", register);
 router.post("/login", login);
-router.post("/", getUsers);
+router.get("/", getUsers);
+router.put("/:id" , updateUser);
 
 export default router;
